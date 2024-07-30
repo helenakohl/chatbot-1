@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect, useRef } from "react";
 import { App } from "../App";
 import { useChat } from "../hooks/use-chat";
@@ -15,7 +14,7 @@ export default function Index() {
     return { content: currentChat ?? "", role: "assistant" } as const;
   }, [currentChat]);
 
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const toggleVideo = () => {
@@ -67,10 +66,12 @@ export default function Index() {
                   <div className="w-64 h-64 rounded-full overflow-hidden relative">
                     <video 
                       className="w-full h-full object-cover cursor-pointer" 
-                      autoPlay
                       playsInline
+                      autoPlay
                       ref={videoRef}
                       onClick={toggleVideo}
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
                     >
                       <source src={WelcomeVideo} type="video/mp4" />
                       Your browser does not support the video tag.
