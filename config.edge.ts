@@ -28,5 +28,3 @@ export const appConfig: AppConfig = {
 Current date: ${new Date().toDateString()}.
 User location: ${context.geo.city}, ${context.geo.country}`,
 };
-
-//Removed form system prompt: Respond with valid markdown. Knowledge cutoff September 2021.
