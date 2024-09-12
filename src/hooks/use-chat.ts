@@ -2,7 +2,6 @@ import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { appConfig } from "../../config.browser";
 import { v4 as uuidv4 } from 'uuid';
 
-
 const API_PATH = "/api/chat";
 
 interface ChatMessage {
@@ -27,6 +26,32 @@ function streamAsyncIterator(stream: ReadableStream) {
     },
   };
 }
+
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+  immediate = false
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return function(this: any, ...args: Parameters<T>) {
+    const context = this;
+
+    const later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+
+    const callNow = immediate && !timeout;
+
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(later, wait);
+
+    if (callNow) func.apply(context, args);
+  };
+}
+
 
 export function useChat() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -119,14 +144,12 @@ export function useChat() {
   }
     
   // Sends a new message to the AI function and streams the response
-  const sendMessage = async (
-    message: string,
-    chatHistory: Array<ChatMessage>,
-  ) => {
-    if (assitantSpeaking) {
-      console.log("Cannot send message while assistant is speaking");
+  const sendMessageImpl = useCallback(async (message: string, chatHistory: Array<ChatMessage>) => {
+    if (state !== "idle" || assitantSpeaking) {
+      console.log("Cannot send message while processing or speaking");
       return;
     }
+
     setState("waiting");
     let chatContent = "";
     const newHistory = [
@@ -134,7 +157,6 @@ export function useChat() {
       { role: "user", content: message } as const,
     ];
 
-    //Log user's message
     await writeToGoogleSheet(message, 'user');
 
     setChatHistory(newHistory);
@@ -186,7 +208,9 @@ export function useChat() {
     // Play the assistant's response as speech
     await speak(fullResponse);
     setState("idle"); 
-  };
+  }, [state, assitantSpeaking, writeToGoogleSheet]);
 
-  return { sendMessage, currentChat, chatHistory, cancel, clear, state, speak, assitantSpeaking };
+  const sendMessage = useMemo(() => debounce(sendMessageImpl, 300, true), [sendMessageImpl]);
+
+  return { sendMessage, currentChat, chatHistory, cancel, clear, state, setState, speak, assitantSpeaking };
 }
