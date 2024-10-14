@@ -1,4 +1,4 @@
-# A BMW Sales assitant 
+# A BMW Sales Assistant 
 based on 🤖 Daneel: https://github.com/ascorbic/daneel/
 
 ### Try it here: 
