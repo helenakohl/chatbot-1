@@ -19,7 +19,7 @@ export const handler: Handler = async (event, context) => {
 
     const request = {
       input: { text },
-      voice: { languageCode: 'en-GB', name: 'en-GB-Studio-C' as const }, //languageCode: 'en-US', name: 'en-US-Journey-F' 
+      voice: { languageCode: 'en-GB', name: 'en-GB-Studio-C' as const }, 
       audioConfig: { audioEncoding: 'MP3' as const, 
         speakingRate: 1.1
        },
