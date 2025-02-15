@@ -6,3 +6,8 @@ command = "npm run dev"
 
 [template.environment]
 OPENAI_API_KEY = "your OpenAI API key"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
